@@ -10,9 +10,10 @@ Dev/testnet variant of `frontpage-profile`. That skill carries the full flow —
 ## Install
 
 ```bash
-npx skills add DFectuoso/frontpage-sh-skills-dev    # this dev twin
-npx skills add DFectuoso/frontpage-sh-skills        # the base skill it builds on
+npx skills add DFectuoso/frontpage-sh-skills-dev
 ```
+
+The dev repo bundles the base skills, so this one install gives you both this twin and the base skill it builds on.
 
 ## Overrides
 

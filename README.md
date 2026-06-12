@@ -5,9 +5,10 @@ Testnet twins of the [frontpage.sh agent skills](https://github.com/DFectuoso/fr
 ## Install
 
 ```bash
-npx skills add DFectuoso/frontpage-sh-skills-dev    # the dev twins
-npx skills add DFectuoso/frontpage-sh-skills        # plus the base skills (the dev ones reference them)
+npx skills add DFectuoso/frontpage-sh-skills-dev
 ```
+
+This repo bundles the base skills (`frontpage-buy-ad`, `frontpage-vote`, `frontpage-profile`) alongside the dev twins — the twins reference them for the full flow, so one install is self-sufficient.
 
 ## Skills
 
