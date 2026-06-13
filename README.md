@@ -5,10 +5,17 @@ Testnet twins of the [frontpage.sh agent skills](https://github.com/DFectuoso/fr
 ## Install
 
 ```bash
-npx skills add DFectuoso/frontpage-sh-skills-dev
+npx skills add DFectuoso/frontpage-sh-skills-dev --copy
 ```
 
 This repo bundles the base skills (`frontpage-buy-ad`, `frontpage-vote`, `frontpage-profile`) alongside the dev twins — the twins reference them for the full flow, so one install is self-sufficient.
+
+
+> **Why `--copy`?** The skills CLI's default all-agents *symlink* mode currently
+> skips creating Claude Code's `.claude/skills/` links (CLI bug — copy mode and
+> `--agent claude-code` both work). If you installed without `--copy` and your
+> agent can't see the skills, re-run with it, or link manually:
+> `mkdir -p .claude/skills && ln -s ../../.agents/skills/<name> .claude/skills/<name>`
 
 ## Skills
 

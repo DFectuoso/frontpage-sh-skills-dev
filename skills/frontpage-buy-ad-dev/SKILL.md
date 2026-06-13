@@ -10,7 +10,7 @@ Dev/testnet variant of `frontpage-buy-ad`. That skill carries the full flow — 
 ## Install
 
 ```bash
-npx skills add DFectuoso/frontpage-sh-skills-dev
+npx skills add DFectuoso/frontpage-sh-skills-dev --copy
 ```
 
 The dev repo bundles the base skills, so this one install gives you both this twin and the base skill it builds on.
