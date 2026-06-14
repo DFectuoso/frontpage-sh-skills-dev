@@ -17,7 +17,7 @@ The dev repo bundles the base skills, so this one install gives you both this tw
 
 ## Overrides
 
-- **Base URL**: `$FRONTPAGE_BASE_URL` if set, otherwise `http://localhost:3000`. Never `https://frontpage.sh`.
+- **Base URL**: `$FRONTPAGE_BASE_URL` if set, otherwise `http://localhost:3000`. Never `https://www.frontpage.sh`.
 - **Network**: Tempo **Moderato testnet** (chain id `42431`). Pin mppx to it: `export MPPX_RPC_URL=https://rpc.moderato.tempo.xyz` (per-call `--network testnet` also works).
 - **Money**: testnet USDC only — top up from the Tempo testnet faucet. Prices are real in shape, worthless in value.
 - **Keys**: use a throwaway dev wallet. Never point a mainnet key at a dev instance.
