@@ -84,12 +84,13 @@ MPP handles the 402 challenge automatically — the SDK signs the USDC transfer 
                          // refund wired" notice land here. Never public.
 
   // image: rendered as a COVER layer over adBg, at the square's true ratio.
-  // ⚠ PNG or JPEG ONLY. webp, gif, svg and avif are REJECTED (HTTP 400
-  //   IMAGE_UNSUPPORTED) — the server checks the actual bytes, not the
+  // Animated GIF is allowed and animates on the grid (the social card shows its
+  // first frame). ⚠ PNG, JPEG or GIF ONLY. webp, svg and avif are REJECTED (HTTP
+  //   400 IMAGE_UNSUPPORTED) — the server checks the actual bytes, not the
   //   filename/MIME, so re-encoding a webp as ".png" still fails. Convert to
-  //   PNG or JPEG before sending. (Many models default to webp — do NOT.)
-  image?: string,        // base64/data URL, PNG or JPEG only; max 1 MB per image
-  imageUrl?: string,     // OR a public PNG/JPEG URL — we download & re-host it in
+  //   PNG, JPEG or GIF before sending. (Many models default to webp — do NOT.)
+  image?: string,        // base64/data URL, PNG, JPEG or GIF only; max 3 MB per image
+  imageUrl?: string,     // OR a public PNG/JPEG/GIF URL — we download & re-host it in
                          // our own store (no hot-linking). Must be publicly
                          // fetchable & ≤4 MB, else 400 (IMAGE_FETCH_FAILED /
                          // IMAGE_UNSUPPORTED). Prefer `image` if you have bytes.
@@ -111,7 +112,7 @@ MPP handles the 402 challenge automatically — the SDK signs the USDC transfer 
 - **Read `nextPriceMicros` from `/api/ads`** — no tier math needed; it's exactly what `/api/buy` will charge.
 - **Bring a perk.** Squares with a perk + promo code give viewers a reason to click through — that's the conversion the slot is for.
 - **Pass the brand's `xHandle`.** Every buy auto-posts to @frontpagesh; with `xHandle` set, that post @mentions the brand (notifies them, invites a retweet — free reach).
-- **Images must be PNG or JPEG — never webp.** The server validates the actual bytes and returns `400 IMAGE_UNSUPPORTED` for webp/gif/svg/avif (and for a webp renamed `.png`). If your source is webp, convert it to PNG or JPEG first.
+- **Images must be PNG, JPEG or GIF — never webp.** The server validates the actual bytes and returns `400 IMAGE_UNSUPPORTED` for webp/svg/avif (and for a webp renamed `.png`). If your source is webp, convert it to PNG, JPEG or GIF first. Animated GIFs animate on the grid; the social card uses their first frame.
 - **Design for the real ratio.** Your image cover-crops to the slot's shape (and tighter crops on mobile) — keep the message in the center.
 - **Moderation runs server-side** (OpenAI omni-moderation) over every text field AND the creative image. Sexual / hateful / harassing / violent / self-harm / illicit content → `400 MODERATION_FAILED` (charged, since moderation runs post-payment).
 - **The flip is instant.** The previous owner's refund settles inline or via the retry worker; read `payout.status` on the receipt.
