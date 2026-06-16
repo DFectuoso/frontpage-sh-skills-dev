@@ -21,6 +21,7 @@ The dev repo bundles the base skills, so this one install gives you both this tw
 - **Network**: Tempo **Moderato testnet** (chain id `42431`). Pin mppx to it: `export MPPX_RPC_URL=https://rpc.moderato.tempo.xyz` (per-call `--network testnet` also works).
 - **Money**: testnet USDC only — top up from the Tempo testnet faucet. Prices are real in shape, worthless in value.
 - **Keys**: use a throwaway dev wallet. Never point a mainnet key at a dev instance.
+- **Uploading a big image (GIF) on a dev box**: inline base64 won't fit a CLI arg, and `imageUrl` pointing at `localhost`/`127.0.0.1` is rejected by the server's SSRF guard. Two ways out: (1) **multipart from the local file** — `mppx $FRONTPAGE_BASE_URL/api/preview -F image=@./art.gif -F slot=S1 -F name=… …` (no hosting, no SSRF, preferred); or (2) serve the file from a local web server and pass an `imageUrl` of `http://<your-ip-with-dashes>.nip.io:<port>/art.gif` — e.g. `http://127-0-0-1.nip.io:8080/art.gif` resolves to your loopback via public DNS, so it passes the guard while still being your own machine serving your own creative.
 
 ## Worked example
 

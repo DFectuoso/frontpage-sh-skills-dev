@@ -86,15 +86,23 @@ MPP handles the 402 challenge automatically — the SDK signs the USDC transfer 
                          // refund wired" notice land here. Never public.
 
   // image: rendered as a COVER layer over adBg, at the square's true ratio.
-  // ⚠ PNG or JPEG ONLY. webp, gif, svg and avif are REJECTED (HTTP 400
-  //   IMAGE_UNSUPPORTED) — the server checks the actual bytes, not the
+  // Animated GIF is allowed and animates on the grid (the social card shows its
+  // first frame). ⚠ PNG, JPEG or GIF ONLY. webp, svg and avif are REJECTED (HTTP
+  //   400 IMAGE_UNSUPPORTED) — the server checks the actual bytes, not the
   //   filename/MIME, so re-encoding a webp as ".png" still fails. Convert to
-  //   PNG or JPEG before sending. (Many models default to webp — do NOT.)
-  image?: string,        // base64/data URL, PNG or JPEG only; max 1 MB per image
-  imageUrl?: string,     // OR a public PNG/JPEG URL — we download & re-host it in
+  //   PNG, JPEG or GIF before sending. (Many models default to webp — do NOT.)
+  image?: string,        // base64/data URL, PNG, JPEG or GIF only; max 3 MB per image
+  imageUrl?: string,     // OR a public PNG/JPEG/GIF URL — we download & re-host it in
                          // our own store (no hot-linking). Must be publicly
                          // fetchable & ≤4 MB, else 400 (IMAGE_FETCH_FAILED /
-                         // IMAGE_UNSUPPORTED). Prefer `image` if you have bytes.
+                         // IMAGE_UNSUPPORTED).
+  // BIG FILES (animated GIFs are often 1–3 MB): do NOT inline the base64 into a
+  //   shell/CLI argument — most clients cap a single arg at ~128 KB, and even a
+  //   1 MB image is ~1.4 MB of base64. Best path is MULTIPART: POST
+  //   multipart/form-data with `image` as a FILE part (the rest of this payload
+  //   as form fields) — streamed, no arg-size limit, no hosting needed. With
+  //   mppx that's `-F image=@./art.gif` (use your client's multipart/file flag).
+  //   Otherwise host the image at a public URL and pass `imageUrl`.
   // recommended dimensions (2× display, true slot ratios):
   //   large 1712×944 (1.81:1) · medium 1136×464 (2.45:1) · small 560×464 (1.21:1)
 
@@ -115,7 +123,8 @@ MPP handles the 402 challenge automatically — the SDK signs the USDC transfer 
 - **Read `nextPriceMicros` from `/api/ads`** — no tier math needed; it's exactly what `/api/buy` will charge.
 - **Bring a perk.** Squares with a perk + promo code give viewers a reason to click through — that's the conversion the slot is for.
 - **Pass the brand's `xHandle`.** Every buy auto-posts to @frontpagesh; with `xHandle` set, that post @mentions the brand (notifies them, invites a retweet — free reach).
-- **Images must be PNG or JPEG — never webp.** The server validates the actual bytes and returns `400 IMAGE_UNSUPPORTED` for webp/gif/svg/avif (and for a webp renamed `.png`). If your source is webp, convert it to PNG or JPEG first.
+- **Images must be PNG, JPEG or GIF — never webp.** The server validates the actual bytes and returns `400 IMAGE_UNSUPPORTED` for webp/svg/avif (and for a webp renamed `.png`). If your source is webp, convert it to PNG, JPEG or GIF first. Animated GIFs animate on the grid; the social card uses their first frame.
+- **Uploading a big image (esp. a GIF)? Use multipart, not inline base64.** A 1–3 MB GIF base64 won't fit in a single CLI argument (~128 KB limit). POST `multipart/form-data` with `image` as a file part (`mppx -F image=@./art.gif`) — no arg limit, no hosting. Or host it publicly and send `imageUrl`. The decoded image must be ≤3 MB; a fetched `imageUrl` must also be ≤4 MB to download.
 - **Design for the real ratio.** Your image cover-crops to the slot's shape (and tighter crops on mobile) — keep the message in the center.
 - **Moderation runs server-side** (OpenAI omni-moderation) over every text field AND the creative image. Sexual / hateful / harassing / violent / self-harm / illicit content → `400 MODERATION_FAILED` (charged, since moderation runs post-payment).
 - **The flip is instant.** The previous owner's refund settles inline or via the retry worker; read `payout.status` on the receipt.
