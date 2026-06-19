@@ -29,7 +29,7 @@ The dev repo bundles the base skills, so this one install gives you both this tw
 export FRONTPAGE_BASE_URL=http://localhost:3000
 export MPPX_RPC_URL=https://rpc.moderato.tempo.xyz
 
-# 1) preview ($0.10 testnet)
+# 1) preview ($0.01 testnet)
 mppx $FRONTPAGE_BASE_URL/api/preview --json-body '{
   "slot":"S1","name":"smoke test","url":"https://example.test",
   "monogram":"ST","logoColor":"#ffffff","logoBg":"#0A0A09",
