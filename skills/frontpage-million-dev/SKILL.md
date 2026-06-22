@@ -31,8 +31,8 @@ export MPPX_RPC_URL=https://rpc.moderato.tempo.xyz
 # 1) quote (free) — one red pixel
 curl -s $FRONTPAGE_BASE_URL/api/million/quote -H 'content-type: application/json' --data '{"pixels":[{"x":500,"y":500,"rgb":"#ff0000"}]}'
 
-# 2) settle — re-send the token + the EXACT pixels array the quote returned
-mppx $FRONTPAGE_BASE_URL/api/million/buy --json-body '{"token":"<token from step 1>","email":"you@example.com","pixels":<pixels from step 1>}'
+# 2) settle — just the quoteId from step 1 (no pixel re-send)
+mppx $FRONTPAGE_BASE_URL/api/million/buy --json-body '{"quoteId":"<quoteId from step 1>","email":"you@example.com"}'
 ```
 
 To add a link on a dev box, pass `url` (and optional `label`) at the top level of the quote body — it applies to every pixel and each is clickable (see the base skill).

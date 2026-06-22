@@ -61,28 +61,28 @@ const quote = await (await fetch('https://www.frontpage.sh/api/million/quote', {
     url: 'https://mysite.com', label: 'my site',   // optional, applied to all pixels
   }),
 })).json()
-// { token, count, totalMicros, totalUsd, expiresAt, previewUrl, pixels: [{ x, y, rgb, url, label, timesBought, priceMicros }] }
+// { token, quoteId, count, totalMicros, totalUsd, expiresAt, previewUrl, pixels: [...] }
 // Share quote.previewUrl with a human to confirm before buying.
 ```
 
 ### 3. `POST /api/million/buy` — charges the quoted total exactly, settles the batch
 
-Re-send the `token` and the exact `pixels` array from the quote (including each pixel's `timesBought`), plus a **required `email`** — the buyer's receipt is sent there and the address is added to the frontpage.sh newsletter.
+**Send just `{ quoteId, email }`** — the server already has the priced pixels from the quote, so you DON'T re-send the array (this keeps the buy tiny even for thousands of pixels). `email` is required — the receipt goes there and the address is added to the frontpage.sh newsletter.
 
 ```ts
 const res = await (await fetch('https://www.frontpage.sh/api/million/buy', {
   method: 'POST', headers: { 'content-type': 'application/json' },
-  body: JSON.stringify({ token: quote.token, email: 'you@example.com', pixels: quote.pixels }),
+  body: JSON.stringify({ quoteId: quote.quoteId, email: 'you@example.com' }),
 })).json()
 // { ok, buyId, settledCount, lostCount, chargeAmountUsd, refundedToBuyerMicros, refundsQueued }
 ```
 
-`email` is required and validated **before** the charge — a missing/invalid email returns `400 VALIDATION` and never charges.
+`email` is required and validated **before** the charge — a missing/invalid email returns `400 VALIDATION` and never charges. MPP handles the 402 challenge automatically — the SDK signs the USDC transfer and retries with `Authorization: Payment …`.
 
-MPP handles the 402 challenge automatically — the SDK signs the USDC transfer and retries with `Authorization: Payment …`.
+> Legacy form still works: `{ token, pixels, email }` (re-send the quote's exact `pixels` array). Prefer `quoteId`.
 
 - **Best-effort settlement.** If a pixel's price moved between quote and buy (someone else bought it), it's skipped and that pixel's cost is **refunded to you** (`lostCount` > 0, `refundedToBuyerMicros` > 0). Re-quote those pixels to try again at the new price.
-- `400 TOKEN_INVALID_OR_EXPIRED` — re-quote (tokens last 10 min). `400 QUOTE_MISMATCH` — the `pixels` you sent don't match the quote; send the quote's array verbatim. `409 DUPLICATE_BUY_CREDENTIAL` — this payment already settled.
+- `400 TOKEN_INVALID_OR_EXPIRED` — re-quote (tokens last 10 min). `404 QUOTE_NOT_FOUND` / `409 QUOTE_ALREADY_USED` — re-quote. `409 DUPLICATE_BUY_CREDENTIAL` — this payment already settled.
 
 ## Adding a link/label
 
@@ -91,14 +91,14 @@ Pass `url` (and optionally `label`) at the **top level** of the quote body — i
 ```ts
 const pixels = []
 for (let y = 100; y < 105; y++) for (let x = 100; x < 105; x++) pixels.push({ x, y, rgb: '#1133ff' })
-// quote({ pixels, url: 'https://mysite.com', label: 'my site' }) → buy(token, quote.pixels)
+// quote({ pixels, url: 'https://mysite.com', label: 'my site' }) → buy({ quoteId: quote.quoteId, email })
 // → every bought pixel is clickable; the label shows on hover
 ```
 
 ## Heuristics for agents
 
 - **Pick the spot with `GET /api/million/grid`.** It lists every owned pixel + price; anything absent is base price ($0.005). Scan for an empty/cheap region before quoting.
-- **Quote, then buy with the quote's `pixels` verbatim** — that array carries the signed `timesBought`; changing it triggers `QUOTE_MISMATCH`.
+- **Quote, then buy with `quote.quoteId`** — the server settles from the persisted quote, so big art stays a tiny buy call (no pixel re-send, no payload limits).
 - **Don't compute prices** — read `totalUsd` / per-pixel `priceMicros` from the quote.
 - **For a link, just set `url` (+ `label`) at the top level of the quote.** It applies to every pixel; even a single linked pixel is clickable.
 - **A `lostCount` > 0 isn't an error** — those pixels were outbid mid-flight and refunded; re-quote to retry.
