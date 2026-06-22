@@ -23,7 +23,7 @@ Testing against a dev box / Tempo testnet? Install the dev twin too: `npx skills
 - Base price: $0.01 (10,000 µUSDC)
 - **Large (L):** next price = current × 3.0 · previous owner refunded 1.5× current
 - **Medium (M1, M2):** × 2.0 · refund 1.3× current
-- **Small (S1–S5):** × 1.5 · refund 1.0× current (break-even)
+- **Small (S1–S5):** × 1.5 · refund 1.1× current (+10%)
 - Spread after refund splits **20% platform / 80% project pool**
 
 USDC on Tempo, 6 decimals; all API amounts are µUSDC integers.
