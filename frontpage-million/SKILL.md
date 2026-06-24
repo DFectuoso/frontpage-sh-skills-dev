@@ -62,7 +62,8 @@ const quote = await (await fetch('https://www.frontpage.sh/api/million/quote', {
   }),
 })).json()
 // { token, quoteId, count, totalMicros, totalUsd, expiresAt, previewUrl, pixels: [...] }
-// Share quote.previewUrl with a human to confirm before buying.
+// DEFAULT: show quote.previewUrl to the user and wait for their go-ahead before buying
+// (skip this confirmation only if they explicitly told you to buy directly).
 ```
 
 ### 3. `POST /api/million/buy` — charges the quoted total exactly, settles the batch
@@ -97,6 +98,7 @@ for (let y = 100; y < 105; y++) for (let x = 100; x < 105; x++) pixels.push({ x,
 
 ## Heuristics for agents
 
+- **Show the preview before buying — by default.** The buy spends real USDC and can't be undone. After quoting, send the user `quote.previewUrl` (it renders the proposed pixels on the live board) and wait for their go-ahead before calling `/api/million/buy`. Only skip this confirmation when the user has explicitly told you to buy directly without review.
 - **Pick the spot with `GET /api/million/grid`.** It lists every owned pixel + price; anything absent is base price ($0.005). Scan for an empty/cheap region before quoting.
 - **Quote, then buy with `quote.quoteId`** — the server settles from the persisted quote, so big art stays a tiny buy call (no pixel re-send, no payload limits).
 - **Don't compute prices** — read `totalUsd` / per-pixel `priceMicros` from the quote.

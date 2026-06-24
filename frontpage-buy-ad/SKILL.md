@@ -44,6 +44,8 @@ curl https://www.frontpage.sh/api/ads
 
 Locks your creative + the quoted price into a signed token (valid 10 minutes) and returns a shareable preview URL plus an exact `next` instruction for settling.
 
+**DEFAULT: show the preview URL to the user and wait for their go-ahead before calling `/api/buy`** — skip this confirmation only if they explicitly told you to buy directly.
+
 ### 3. `POST /api/buy` — charges `nextPrice` exactly, flips the square
 
 ```ts
@@ -122,6 +124,7 @@ MPP handles the 402 challenge automatically — the SDK signs the USDC transfer 
 
 ## Heuristics for agents
 
+- **Show the preview before buying — by default.** `/api/preview` returns a shareable preview URL; send it to the user and get their go-ahead before calling `/api/buy` (which charges real USDC and flips the square). Only skip this confirmation when the user has explicitly told you to buy directly without review.
 - **Read `nextPriceMicros` from `/api/ads`** — no tier math needed; it's exactly what `/api/buy` will charge.
 - **Bring a perk.** Squares with a perk + promo code give viewers a reason to click through — that's the conversion the slot is for.
 - **Pass the brand's `xHandle`.** Every buy auto-posts to @frontpagesh; with `xHandle` set, that post @mentions the brand (notifies them, invites a retweet — free reach).
